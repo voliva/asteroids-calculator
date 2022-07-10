@@ -13,6 +13,7 @@ import {
   pairwise,
   withLatestFrom,
   tap,
+  timer,
 } from "rxjs";
 
 export const isLocked$ = state(
@@ -31,20 +32,43 @@ export const [movement$, reportMovement] = createSignal<{
 }>();
 
 const rotationSpeed = 0.01;
+const initialRotation = -0.4;
 export const rotation$ = state(
   isLocked$.pipe(
     filter((isLocked) => isLocked),
     switchMap(() =>
       concat(
-        [0],
+        [initialRotation],
         movement$.pipe(
-          scan((acc, { deltaX }) => acc + deltaX * rotationSpeed, 0)
+          scan(
+            (acc, { deltaX }) => acc + deltaX * rotationSpeed,
+            initialRotation
+          )
         )
       )
     )
   ),
-  0
+  initialRotation
 );
+
+// For easy tweaking use this one instead
+// export const rotation$ = state(
+//   fromEvent<KeyboardEvent>(document, "keydown").pipe(
+//     map((evt) => {
+//       evt.preventDefault();
+//       switch (evt.key) {
+//         case "ArrowRight":
+//           return 1;
+//         case "ArrowLeft":
+//           return -1;
+//       }
+//       return null!;
+//     }),
+//     filter((v) => !!v),
+//     scan((acc, v) => acc + v * 0.1, initialRotation)
+//   ),
+//   initialRotation
+// );
 
 const initialSpeed = { x: 0, y: 0 };
 const maxSpeed = 20;
@@ -80,6 +104,18 @@ const speed$ = state(
   initialSpeed
 );
 
+export const isAccelerating$ = state(
+  movement$.pipe(
+    switchMap(({ deltaY }) => {
+      if (deltaY < 0) {
+        return concat([true], timer(20).pipe(map(() => false)));
+      }
+      return [false];
+    })
+  ),
+  false
+);
+
 const initialPosition = { x: 0, y: 0 };
 const positionSpeed = 0.01;
 const calculatorSize = { width: 320, height: 520 };
@@ -112,6 +148,35 @@ export const position$ = state(
   ),
   initialPosition
 );
+
+// For easy tweaking use this one instead
+// export const position$ = state(
+//   fromEvent<KeyboardEvent>(document, "keydown").pipe(
+//     map((evt) => {
+//       evt.preventDefault();
+//       switch (evt.key) {
+//         case "ArrowRight":
+//           return [1, 0];
+//         case "ArrowLeft":
+//           return [-1, 0];
+//         case "ArrowUp":
+//           return [0, -1];
+//         case "ArrowDown":
+//           return [0, 1];
+//       }
+//       return null!;
+//     }),
+//     filter((v) => !!v),
+//     scan(
+//       (acc, [x, y]) => ({
+//         x: acc.x + x*2,
+//         y: acc.y + y*2,
+//       }),
+//       initialPosition
+//     )
+//   ),
+//   initialPosition
+// );
 
 function abs2(vector: { x: number; y: number }) {
   return vector.x * vector.x + vector.y * vector.y;

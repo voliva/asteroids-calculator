@@ -20,11 +20,20 @@ function App() {
 
   return (
     <div ref={ref} onMouseMove={handleMouseMove} onClick={performClick}>
-      <button disabled={isLocked} onClick={requestLock}>
+      <button
+        disabled={isLocked}
+        onClick={requestLock}
+        style={{
+          position: "absolute",
+          top: "1rem",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }}
+      >
         Start
       </button>
       <div id="wrapper">
-        <div id="app">
+        <div id="calculator-app">
           <Calculator />
         </div>
       </div>
