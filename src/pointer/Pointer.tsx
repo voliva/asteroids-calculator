@@ -1,9 +1,15 @@
 import { useStateObservable } from "@react-rxjs/core";
-import { position$, rotation$ } from "./state";
+import { useEffect } from "react";
+import { clickEffect$, position$, rotation$ } from "./state";
 
 export function Pointer() {
   const rotation = useStateObservable(rotation$);
   const position = useStateObservable(position$);
+
+  useEffect(() => {
+    const sub = clickEffect$.subscribe();
+    return () => sub.unsubscribe();
+  }, []);
 
   return (
     <div

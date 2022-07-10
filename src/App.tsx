@@ -2,7 +2,7 @@ import { useStateObservable } from "@react-rxjs/core";
 import React, { useRef } from "react";
 import { Calculator } from "./calculator/Calculator";
 import { Pointer } from "./pointer/Pointer";
-import { isLocked$, reportMovement } from "./pointer/state";
+import { isLocked$, performClick, reportMovement } from "./pointer/state";
 
 function App() {
   const ref = useRef<HTMLDivElement>(null);
@@ -19,11 +19,15 @@ function App() {
   }
 
   return (
-    <div id="app" ref={ref} onMouseMove={handleMouseMove}>
+    <div ref={ref} onMouseMove={handleMouseMove} onClick={performClick}>
       <button disabled={isLocked} onClick={requestLock}>
         Start
       </button>
-      <Calculator />
+      <div id="wrapper">
+        <div id="app">
+          <Calculator />
+        </div>
+      </div>
       {isLocked ? <Pointer /> : null}
     </div>
   );

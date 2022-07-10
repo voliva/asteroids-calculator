@@ -191,45 +191,6 @@ export class Calculator extends React.Component {
     });
   }
 
-  handleKeyDown = (event) => {
-    let { key } = event;
-
-    if (key === "Enter") key = "=";
-
-    if (/\d/.test(key)) {
-      event.preventDefault();
-      this.inputDigit(parseInt(key, 10));
-    } else if (key in CalculatorOperations) {
-      event.preventDefault();
-      this.performOperation(key);
-    } else if (key === ".") {
-      event.preventDefault();
-      this.inputDot();
-    } else if (key === "%") {
-      event.preventDefault();
-      this.inputPercent();
-    } else if (key === "Backspace") {
-      event.preventDefault();
-      this.clearLastChar();
-    } else if (key === "Clear") {
-      event.preventDefault();
-
-      if (this.state.displayValue !== "0") {
-        this.clearDisplay();
-      } else {
-        this.clearAll();
-      }
-    }
-  };
-
-  componentDidMount() {
-    document.addEventListener("keydown", this.handleKeyDown);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyDown);
-  }
-
   render() {
     const { displayValue } = this.state;
 

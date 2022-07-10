@@ -41,6 +41,7 @@ button:active {
   width: 320px;
   height: 520px;
   position: relative;
+  pointer-events: none;
 }
 
 .calculator {
