@@ -1,14 +1,21 @@
-import React, { RefObject, useEffect, useRef, useState } from "react";
+import { useStateObservable } from "@react-rxjs/core";
+import React, { useRef } from "react";
 import { Calculator } from "./calculator/Calculator";
+import { Pointer } from "./pointer/Pointer";
+import { isLocked$, reportMovement } from "./pointer/state";
 
 function App() {
   const ref = useRef<HTMLDivElement>(null);
-  const [isLocked, requestLock] = usePointerLock(ref);
+  const isLocked = useStateObservable(isLocked$);
 
   function handleMouseMove(evt: React.MouseEvent) {
     if (!isLocked) return;
 
-    console.log(evt.movementX, evt.movementY);
+    reportMovement({ deltaX: evt.movementX, deltaY: evt.movementY });
+  }
+
+  function requestLock() {
+    ref.current?.requestPointerLock() as any as Promise<void>;
   }
 
   return (
@@ -17,26 +24,9 @@ function App() {
         Start
       </button>
       <Calculator />
+      {isLocked ? <Pointer /> : null}
     </div>
   );
-}
-
-function usePointerLock(elementRef: RefObject<HTMLElement>) {
-  const [isLocked, setIsLocked] = useState(false);
-  function requestLock() {
-    elementRef.current?.requestPointerLock() as any as Promise<void>;
-  }
-
-  useEffect(() => {
-    function handler() {
-      setIsLocked(Boolean(document.pointerLockElement));
-    }
-    document.addEventListener("pointerlockchange", handler);
-
-    return () => document.removeEventListener("pointerlockchange", handler);
-  }, []);
-
-  return [isLocked, requestLock] as const;
 }
 
 export default App;
